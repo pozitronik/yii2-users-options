@@ -1,0 +1,27 @@
+{
+	"name": "pozitronik/yii2-user-options",
+	"description": "Server-side personal user options",
+	"type": "yii2-extension",
+	"keywords": [
+		"yii2",
+		"extension"
+	],
+	"license": "GPL-3.0",
+	"authors": [
+		{
+			"name": "Pavel Dubrovsky",
+			"email": "antikillerxxl@gmail.com"
+		}
+	],
+	"require": {
+
+	},
+	"require-dev": {
+		"yiisoft/yii2": "*"
+	},
+	"autoload": {
+		"psr-4": {
+			"pozitronik\\widgets\\": "src"
+		}
+	}
+}
