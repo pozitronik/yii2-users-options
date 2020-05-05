@@ -13,7 +13,7 @@ class UsersOptionsAsset extends AssetBundle {
 	 * @inheritdoc
 	 */
 	public function init() {
-		$this->basePath = '@webroot';
+		$this->sourcePath = __DIR__.'/';
 		$this->js = ['js/users-options.js'];
 		$this->publishOptions = ['forceCopy' => false];
 		parent::init();
