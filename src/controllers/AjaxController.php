@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace pozitronik\users_options\controllers;
 
-use pozitronik\users_options\traits\UsersOptionsTrait;
+use pozitronik\users_options\models\UsersOptions;
 use Throwable;
 use Yii;
 use yii\filters\ContentNegotiator;
@@ -44,8 +44,7 @@ class AjaxController extends Controller {
 		if (false !== $key = Yii::$app->request->post('key', false)) {
 			if (null === $user = Yii::$app->user->identity) return (['user' => 'Unauthorized']);//у меня были отдельные базовые ajax-контроллеры со своими типизированными ответами, тут я сделал чтобы просто работало
 			$value = Yii::$app->request->post('value', []);
-			/** @var UsersOptionsTrait $user */
-			$user->options->set((string)$key, (array)$value);
+			UsersOptions::setStatic((int)$user->getId(), (string)$key, (array)$value);
 			return [];
 		}
 		return (['key' => 'Not specified']);
@@ -59,8 +58,7 @@ class AjaxController extends Controller {
 	public function actionUserGetOption():array {
 		if (false !== $key = Yii::$app->request->post('key', false)) {
 			if (null === $user = Yii::$app->user->identity) return (['user' => 'Unauthorized']);
-			/** @var UsersOptionsTrait $user */
-			return $user->options->get((string)$key);
+			return UsersOptions::getStatic((int)$user->getId(), (string)$key);
 		}
 		return (['key' => 'Not specified']);
 	}
