@@ -28,7 +28,7 @@ class UsersOptions extends ActiveRecord {
 	 * {@inheritdoc}
 	 */
 	public static function tableName():string {
-		return ArrayHelper::getValue(Yii::$app->module->params, 'tableName', 'users_options');
+		return ArrayHelper::getValue(Yii::$app->modules, 'usersoptions.params.tableName', 'users_options');
 	}
 
 	/**
