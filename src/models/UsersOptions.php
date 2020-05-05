@@ -9,8 +9,6 @@ use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
- * This is the model class for table "auth_users_options".
- *
  * @property int $user_id System user id
  * @property string $option Option name
  * @property array $value Option value in JSON
