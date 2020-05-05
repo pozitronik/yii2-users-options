@@ -80,4 +80,27 @@ class UsersOptions extends ActiveRecord {
 		return $userOptions->save();
 	}
 
+	/**
+	 * Статический вызов с той же логикой, что у get()
+	 * @param int $user_id
+	 * @param string $option
+	 * @param bool $decoded -- true, если ожидается, что в настройку сохранён не массив, а единичная опция (строка, логическое значение или цифра)
+	 * @return mixed
+	 * @throws Throwable
+	 */
+	public static function getStatic(int $user_id, string $option, bool $decoded = false) {
+		return (new self(['user_id' => $user_id]))->get($option, $decoded);
+	}
+
+	/**
+	 * Статический вызов с той же логикой, что у set()
+	 * @param int $user_id
+	 * @param string $option
+	 * @param array $value
+	 * @return bool
+	 */
+	public static function setStatic(int $user_id, string $option, array $value):bool {
+		return (new self(['user_id' => $user_id]))->set($option, $value);
+	}
+
 }
