@@ -21,7 +21,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"pozitronik\\widgets\\": "src"
+			"pozitronik\\users_options\\": "src"
 		}
 	}
 }
