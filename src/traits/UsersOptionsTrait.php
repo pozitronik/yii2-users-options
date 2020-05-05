@@ -18,6 +18,7 @@ trait UsersOptionsTrait {
 	 */
 	public function getOptions():UsersOptions {
 		/** @var ActiveRecord $this */
+		/** @noinspection PhpUndefinedFieldInspection */
 		return new UsersOptions(['user_id' => $this->id]);
 	}
 }
