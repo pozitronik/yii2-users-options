@@ -7,7 +7,7 @@ use pozitronik\users_options\models\UsersOptions;
 use yii\db\ActiveRecord;
 
 /**
- * Trait UserыOptionsTrait
+ * Trait UsersOptionsTrait
  * @package pozitronik\users_options\traits
  *
  * @property UsersOptions $options -- атрибут для обращения к правам пользователя (не реляционный, см. класс)
