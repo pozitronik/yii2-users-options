@@ -1,4 +1,5 @@
 <?php
+/** @noinspection EmptyClassInspection */
 declare(strict_types = 1);
 
 namespace pozitronik\users_options;
