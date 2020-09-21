@@ -5,6 +5,7 @@ namespace pozitronik\users_options\models;
 
 use Throwable;
 use Yii;
+use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -62,7 +63,9 @@ class UsersOptions extends ActiveRecord {
 	 * @throws Throwable
 	 */
 	public function get(string $option, bool $decoded = false) {
-		$value = (null === $result = self::find()->where(['option' => $option, 'user_id' => $this->user_id])->one())?[]:$result->value;
+		$value = Yii::$app->cache->getOrSet(static::class."::get{$option}", static function() use ($option) {
+			return (null === $result = self::find()->where(['option' => $option, 'user_id' => $this->user_id])->one())?[]:$result->value;
+		}, null, new TagDependency(['tags' => static::class."::get{$option}"]));
 		return ($decoded)?json_decode(ArrayHelper::getValue($value, 0, '')):$value;
 	}
 
@@ -72,6 +75,7 @@ class UsersOptions extends ActiveRecord {
 	 * @return bool
 	 */
 	public function set(string $option, array $value):bool {
+		TagDependency::invalidate(Yii::$app->cache, [static::class."::get{$option}"]);
 		if (null === $userOptions = self::find()->where(['option' => $option, 'user_id' => $this->user_id])->one()) {
 			$userOptions = new self(['user_id' => $this->user_id, 'option' => $option, 'value' => $value]);
 		} else {
