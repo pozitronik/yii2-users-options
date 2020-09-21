@@ -63,7 +63,7 @@ class UsersOptions extends ActiveRecord {
 	 * @throws Throwable
 	 */
 	public function get(string $option, bool $decoded = false) {
-		$value = Yii::$app->cache->getOrSet(static::class."::get{$option}", static function() use ($option) {
+		$value = Yii::$app->cache->getOrSet(static::class."::get{$option}", function() use ($option) {
 			return (null === $result = self::find()->where(['option' => $option, 'user_id' => $this->user_id])->one())?[]:$result->value;
 		}, null, new TagDependency(['tags' => static::class."::get{$option}"]));
 		return ($decoded)?json_decode(ArrayHelper::getValue($value, 0, '')):$value;
