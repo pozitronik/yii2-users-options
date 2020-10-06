@@ -13,6 +13,7 @@ use yii\helpers\ArrayHelper;
  * @property int $user_id System user id
  * @property string $option Option name
  * @property array $value Option value in JSON
+ * @property string $rawValue Raw option value in JSON
  *
  * Функции доступны у модели пользователя как $user->options->get($key, $decoded = false) и $user->options->set($key, $value);
  * По умолчанию ожидается, что $value -- массив (модель изначально проектировалась для хранения наборов данных - фильтров, закладок, куков, спамов), но можно хранить и скалярные типы данных, преобразуя их к array
@@ -39,7 +40,7 @@ class UsersOptions extends ActiveRecord {
 		return [
 			[['id', 'user_id'], 'integer'],
 			[['option'], 'required'],
-			[['value'], 'safe'],
+			[['value', 'rawValue'], 'safe'],
 			[['option'], 'string', 'max' => 32],
 			[['user_id', 'option'], 'unique', 'targetAttribute' => ['user_id', 'option']]
 		];
@@ -52,7 +53,8 @@ class UsersOptions extends ActiveRecord {
 		return [
 			'user_id' => 'System user id',
 			'option' => 'Option name',
-			'value' => 'Option value in JSON'
+			'value' => 'Option value in JSON',
+			'rawValue' => 'Raw option value in JSON'
 		];
 	}
 
@@ -105,6 +107,20 @@ class UsersOptions extends ActiveRecord {
 	 */
 	public static function setStatic(int $user_id, string $option, array $value):bool {
 		return (new self(['user_id' => $user_id]))->set($option, $value);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getRawValue():string {
+		return json_encode($this->value, JSON_UNESCAPED_UNICODE);
+	}
+
+	/**
+	 * @param array $rawValue
+	 */
+	public function setRawValue(string $rawValue):void {
+		$this->value = json_decode($rawValue, true);
 	}
 
 }
