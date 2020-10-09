@@ -5,25 +5,36 @@ namespace pozitronik\users_options\models;
 
 use Throwable;
 use Yii;
+use yii\base\Model;
 use yii\caching\TagDependency;
-use yii\db\ActiveRecord;
+use yii\db\Connection;
+use yii\db\Query;
+use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
 /**
- * @property int $user_id System user id
- * @property string $option Option name
- * @property array $value Option value in JSON
- *
- * Функции доступны у модели пользователя как $user->options->get($key, $decoded = false) и $user->options->set($key, $value);
- * По умолчанию ожидается, что $value -- массив (модель изначально проектировалась для хранения наборов данных - фильтров, закладок, куков, спамов), но можно хранить и скалярные типы данных, преобразуя их к array
- * В этом случае доставать опцию через get нужно с параметром $decoded = true.
+ * Функции доступны у модели пользователя как $user->options->get($key) и $user->options->set($key, $value);
+ * $value может быть любым сериализуемым типом данных.
  *
  * Для работы в фоне см. controllers\AjaxController и UsersOptionsAsset.
  *
  * При подключении ассета становится доступна асинхронная js-функция set_option(key, value), она сохранит настройку для текущего пользователя. Тип данных value может быть любой.
  * Js-геттера нет, т.к. не пригодился.
  */
-class UsersOptions extends ActiveRecord {
+class UsersOptions extends Model {
+
+	/**
+	 * @var null|int the user identification key. Defaults to null, meaning use current active user id.
+	 */
+	public $user_id;
+
+	/**
+	 * @var Connection|array|string the DB connection object or the application component ID of the DB connection.
+	 * After the UsersOptions object is created, if you want to change this property, you should only assign it
+	 * with a DB connection object.
+	 * This can also be a configuration array for creating the object.
+	 */
+	public $db = 'db';
 
 	/**
 	 * @var null|array the functions used to serialize and unserialize values. Defaults to null, meaning
@@ -46,44 +57,20 @@ class UsersOptions extends ActiveRecord {
 	 * ...
 	 */
 	public $cacheEnabled = false;
-
 	/**
-	 * {@inheritdoc}
+	 * @var string
 	 */
-	public static function tableName():string {
-		return ArrayHelper::getValue(Yii::$app->modules, 'usersoptions.params.tableName', 'users_options');
-	}
+	private $_tableName = 'users_options';
 
 	/**
 	 * {@inheritdoc}
 	 */
 	public function init():void {
 		parent::init();
+		if (null === $this->user_id) $this->user_id = Yii::$app->user->id;
+		$this->db = Instance::ensure($this->db, Connection::class);
+		$this->_tableName = ArrayHelper::getValue(Yii::$app->modules, 'usersoptions.params.tableName', 'users_options');
 		$this->cacheEnabled = ArrayHelper::getValue(Yii::$app->modules, 'usersoptions.params.cacheEnabled', false);
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules():array {
-		return [
-			[['id', 'user_id'], 'integer'],
-			[['option'], 'required'],
-			[['value', 'rawValue'], 'safe'],
-			[['option'], 'string', 'max' => 32],
-			[['user_id', 'option'], 'unique', 'targetAttribute' => ['user_id', 'option']]
-		];
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function attributeLabels():array {
-		return [
-			'user_id' => 'System user id',
-			'option' => 'Option name',
-			'value' => 'Option value',
-		];
 	}
 
 	/**
@@ -107,7 +94,28 @@ class UsersOptions extends ActiveRecord {
 	 * @return string
 	 */
 	private function getDbValue(string $option):string {
-		return (null === $result = self::find()->where(['option' => $option, 'user_id' => $this->user_id])->one())?'':$result->value;
+		return ArrayHelper::getValue((new Query())->select('value')->from($this->_tableName)->where(['option' => $option, 'user_id' => $this->user_id])->one(), 'value', '');
+	}
+
+	/**
+	 * @param string $option
+	 * @param string $value
+	 * @return bool
+	 */
+	private function setDbValue(string $option, string $value):bool {
+		try {
+			$this->db->noCache(function(Connection $db) use ($option, $value) {
+				$db->createCommand()->upsert($this->_tableName, [
+					'user_id' => $this->user_id,
+					'option' => $option,
+					'value' => $value
+				])->execute();
+				return true;
+			});
+		} catch (Throwable $e) {
+			Yii::warning("Unable to update or insert table value: {$e->getMessage()}", __METHOD__);
+		}
+		return false;
 	}
 
 	/**
@@ -132,14 +140,8 @@ class UsersOptions extends ActiveRecord {
 	 * @return bool
 	 */
 	public function set(string $option, $value):bool {
-		$serializedValue = $this->serialize($value);
 		TagDependency::invalidate(Yii::$app->cache, [static::class."::get({$this->user_id},{$option})"]);
-		if (null === $userOptions = self::find()->where(['option' => $option, 'user_id' => $this->user_id])->one()) {
-			$userOptions = new self(['user_id' => $this->user_id, 'option' => $option, 'value' => $serializedValue]);
-		} else {
-			$userOptions->value = $serializedValue;
-		}
-		return $userOptions->save();
+		return $this->setDbValue($option, $this->serialize($value));
 	}
 
 	/**
