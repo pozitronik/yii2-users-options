@@ -61,10 +61,10 @@ php composer.phar require pozitronik/yii2-users-options "dev-master"
 ```php
 
 $options->serializer = [
-	0 => function(string $value) {//функция для сериализации
+	0 => function($value) {//функция для сериализации
 		return json_encode($value);
 	},
-	1 => function() {//функция для десериализации
+	1 => function(string $value) {//функция для десериализации
 		return json_decode($value);
 	},
 ];
