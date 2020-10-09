@@ -44,7 +44,7 @@ class AjaxController extends Controller {
 		if (false !== $key = Yii::$app->request->post('key', false)) {
 			if (null === $user = Yii::$app->user->identity) return (['user' => 'Unauthorized']);//у меня были отдельные базовые ajax-контроллеры со своими типизированными ответами, тут я сделал чтобы просто работало
 			$value = Yii::$app->request->post('value', []);
-			UsersOptions::setStatic((int)$user->getId(), (string)$key, (array)$value);
+			UsersOptions::setStatic((int)$user->getId(), (string)$key, $value);
 			return [];
 		}
 		return (['key' => 'Not specified']);
@@ -58,7 +58,10 @@ class AjaxController extends Controller {
 	public function actionUserGetOption():array {
 		if (false !== $key = Yii::$app->request->post('key', false)) {
 			if (null === $user = Yii::$app->user->identity) return (['user' => 'Unauthorized']);
-			return UsersOptions::getStatic((int)$user->getId(), (string)$key);
+			return [
+				'key' => $key,
+				'value' => UsersOptions::getStatic((int)$user->getId(), (string)$key)
+			];
 		}
 		return (['key' => 'Not specified']);
 	}
