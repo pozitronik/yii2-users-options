@@ -14,7 +14,7 @@ class create_users_options_table extends Migration {
 			'id' => $this->primaryKey(),
 			'user_id' => $this->integer()->comment('System user id'),
 			'option' => $this->string(32)->notNull()->comment('Option name'),
-			'value' => $this->text()->null()->comment('Serialized option value')
+			'value' => $this->binary()->null()->comment('Serialized option value')
 		]);
 
 		$this->createIndex('user_id', 'users_options', 'user_id');
