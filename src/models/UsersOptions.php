@@ -18,6 +18,8 @@ use yii\helpers\ArrayHelper;
  * @property null|array $serializer -- the functions used to serialize and unserialize values. Defaults to null, meaning
  * using the default PHP `serialize()` and `unserialize()` functions
  * @property bool $cacheEnabled -- enable intermediate caching via Yii::$app->cache (must be configured in framework)
+ * @property-read string $tableName
+ *
  * Функции доступны у модели пользователя как $user->options->get($key) и $user->options->set($key, $value);
  * $value может быть любым сериализуемым типом данных.
  *
@@ -169,6 +171,13 @@ class UsersOptions extends Model {
 	 */
 	public static function setStatic(int $user_id, string $option, $value):bool {
 		return (new self(['user_id' => $user_id]))->set($option, $value);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTableName():string {
+		return $this->_tableName;
 	}
 
 }
