@@ -101,7 +101,7 @@ class UsersOptions extends Model {
 	 * @return string
 	 */
 	private function getDbValue(string $option):string {
-		return ArrayHelper::getValue((new Query())->select('value')->from($this->_tableName)->where(['option' => $option, 'user_id' => $this->user_id])->one(), 'value', '');
+		return ArrayHelper::getValue((new Query())->select('value')->from($this->_tableName)->where(['option' => $option, 'user_id' => $this->user_id])->one(), 'value', serialize(null));
 	}
 
 	/**
