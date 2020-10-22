@@ -6,6 +6,19 @@ function set_option(key, value) {
 			value: value,
 		},
 		method: 'POST'
-	}).done(function (data) {
+	}).done(function(data) {
+	});
+}
+
+function get_option(key, callback, defaultValue) {
+	jQuery.ajax({
+		url: '/ajax/user-get-option',
+		data: {
+			key: key
+		},
+		method: 'POST'
+	}).done(function(data) {
+		if (null === data.value) data.value = defaultValue;
+		callback(data.value);
 	});
 }
