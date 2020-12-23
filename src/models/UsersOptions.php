@@ -112,7 +112,7 @@ class UsersOptions extends Model {
 	 */
 	protected function setDbValue(string $option, string $value):bool {
 		try {
-			$this->db->noCache(function(Connection $db) use ($option, $value) {
+			return $this->db->noCache(function(Connection $db) use ($option, $value) {
 				$db->createCommand()->upsert($this->_tableName, [
 					'user_id' => $this->user_id,
 					'option' => $option,
