@@ -85,7 +85,7 @@ class UsersOptions extends Model {
 	 * @param $value
 	 * @return string
 	 */
-	private function serialize($value):string {
+	protected function serialize($value):string {
 		return (null === $this->serializer)?serialize($value):call_user_func($this->serializer[0], $value);
 	}
 
@@ -93,7 +93,7 @@ class UsersOptions extends Model {
 	 * @param string $value
 	 * @return mixed
 	 */
-	private function unserialize(string $value) {
+	protected function unserialize(string $value) {
 		return (null === $this->serializer)?unserialize($value, ['allowed_classes' => true]):call_user_func($this->serializer[1], $value);
 	}
 
@@ -101,7 +101,7 @@ class UsersOptions extends Model {
 	 * @param string $option
 	 * @return string
 	 */
-	private function getDbValue(string $option):string {
+	protected function getDbValue(string $option):string {
 		return ArrayHelper::getValue((new Query())->select('value')->from($this->_tableName)->where(['option' => $option, 'user_id' => $this->user_id])->one(), 'value', serialize(null));
 	}
 
@@ -110,7 +110,7 @@ class UsersOptions extends Model {
 	 * @param string $value
 	 * @return bool
 	 */
-	private function setDbValue(string $option, string $value):bool {
+	protected function setDbValue(string $option, string $value):bool {
 		try {
 			$this->db->noCache(function(Connection $db) use ($option, $value) {
 				$db->createCommand()->upsert($this->_tableName, [
