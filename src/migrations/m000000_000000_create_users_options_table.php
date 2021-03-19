@@ -13,7 +13,7 @@ class m000000_000000_create_users_options_table extends Migration {
 		$this->createTable('users_options', [
 			'id' => $this->primaryKey(),
 			'user_id' => $this->integer()->comment('System user id'),
-			'option' => $this->string(32)->notNull()->comment('Option name'),
+			'option' => $this->string(256)->notNull()->comment('Option name'),
 			'value' => $this->binary()->null()->comment('Serialized option value')
 		]);
 
