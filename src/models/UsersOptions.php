@@ -139,13 +139,11 @@ class UsersOptions extends Model {
 	 */
 	public function get(string $option) {
 		if ($this->cacheEnabled) {
-			$value = Yii::$app->cache->getOrSet(static::class."::get({$this->user_id},{$option})", function() use ($option) {
-				return $this->getDbValue($option);
+			return Yii::$app->cache->getOrSet(static::class."::get({$this->user_id},{$option})", function() use ($option) {
+				return $this->unserialize($this->getDbValue($option));
 			}, null, new TagDependency(['tags' => static::class."::get({$this->user_id},{$option})"]));
-		} else {
-			$value = $this->getDbValue($option);
 		}
-		return $this->unserialize($value);
+		return $this->unserialize($this->getDbValue($option));
 	}
 
 	/**
