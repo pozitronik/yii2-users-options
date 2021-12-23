@@ -86,29 +86,33 @@ class UsersOptions extends Model {
 	 * @return string
 	 */
 	protected function serialize($value):string {
-		return (null === $this->serializer)?serialize($value):call_user_func($this->serializer[0], $value);
+		return (null === $this->serializer)
+			?serialize($value)
+			:call_user_func($this->serializer[0], $value);
 	}
 
 	/**
-	 * @param string|resource $value
+	 * @param string $value
 	 * @return mixed
 	 */
-	protected function unserialize($value) {
-		if (is_resource($value) && 'stream' === get_resource_type($value)) {
-			$serialized = stream_get_contents($value);
-			fseek($value, 0);
-		} else {
-			$serialized = $value;
-		}
-		return (null === $this->serializer)?unserialize($serialized, ['allowed_classes' => true]):call_user_func($this->serializer[1], $serialized);
+	protected function unserialize(string $value) {
+		return (null === $this->serializer)
+			?unserialize($value, ['allowed_classes' => true])
+			:call_user_func($this->serializer[1], $value);
 	}
 
 	/**
 	 * @param string $option
 	 * @return string|resource
 	 */
-	protected function getDbValue(string $option) {
-		return ArrayHelper::getValue((new Query())->select('value')->from($this->_tableName)->where(['option' => $option, 'user_id' => $this->user_id])->one(), 'value', serialize(null));
+	protected function getDbValue(string $option):string {
+		$value = ArrayHelper::getValue((new Query())->select('value')->from($this->_tableName)->where(['option' => $option, 'user_id' => $this->user_id])->one(), 'value', serialize(null));
+		if (is_resource($value) && 'stream' === get_resource_type($value)) {
+			$result = stream_get_contents($value);
+			fseek($value, 0);
+			return $result;
+		}
+		return $value;
 	}
 
 	/**
@@ -138,12 +142,10 @@ class UsersOptions extends Model {
 	 * @throws Throwable
 	 */
 	public function get(string $option) {
-		if ($this->cacheEnabled) {
-			return Yii::$app->cache->getOrSet(static::class."::get({$this->user_id},{$option})", function() use ($option) {
-				return $this->unserialize($this->getDbValue($option));
-			}, null, new TagDependency(['tags' => static::class."::get({$this->user_id},{$option})"]));
-		}
-		return $this->unserialize($this->getDbValue($option));
+		$dbValue = ($this->cacheEnabled)
+			?Yii::$app->cache->getOrSet(static::class."::get({$option})", fn() => $this->retrieveDbValue($option), null, new TagDependency(['tags' => static::class."::get({$option})"]))
+			:$this->retrieveDbValue($option);
+		return $this->unserialize($dbValue);
 	}
 
 	/**
