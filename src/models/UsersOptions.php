@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace pozitronik\users_options\models;
 
+use Exception;
 use Throwable;
 use Yii;
 use yii\base\Model;
@@ -103,9 +104,10 @@ class UsersOptions extends Model {
 
 	/**
 	 * @param string $option
-	 * @return string|resource
+	 * @return string
+	 * @throws Exception
 	 */
-	protected function getDbValue(string $option):string {
+	protected function retrieveDbValue(string $option):string {
 		$value = ArrayHelper::getValue((new Query())->select('value')->from($this->_tableName)->where(['option' => $option, 'user_id' => $this->user_id])->one(), 'value', serialize(null));
 		if (is_resource($value) && 'stream' === get_resource_type($value)) {
 			$result = stream_get_contents($value);
@@ -120,7 +122,7 @@ class UsersOptions extends Model {
 	 * @param string $value
 	 * @return bool
 	 */
-	protected function setDbValue(string $option, string $value):bool {
+	protected function applyDbValue(string $option, string $value):bool {
 		try {
 			return $this->db->noCache(function(Connection $db) use ($option, $value) {
 				$db->createCommand()->upsert($this->_tableName, [
@@ -155,7 +157,7 @@ class UsersOptions extends Model {
 	 */
 	public function set(string $option, $value):bool {
 		TagDependency::invalidate(Yii::$app->cache, [static::class."::get({$this->user_id},{$option})"]);
-		return $this->setDbValue($option, $this->serialize($value));
+		return $this->applyDbValue($option, $this->serialize($value));
 	}
 
 	/**
