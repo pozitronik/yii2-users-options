@@ -8,7 +8,6 @@ use yii\db\ActiveRecord;
 
 /**
  * Trait UsersOptionsTrait
- * @package pozitronik\users_options\traits
  *
  * @property UsersOptions $options Атрибут для обращения к правам пользователя (не реляционный, см. класс)
  */
