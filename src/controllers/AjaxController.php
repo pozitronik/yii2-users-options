@@ -12,10 +12,12 @@ use yii\web\Response;
 
 /**
  * Class AjaxController
- * @package app\controllers
  */
 class AjaxController extends Controller {
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public function init():void {
 		parent::init();
 		$this->enableCsrfValidation = false;
