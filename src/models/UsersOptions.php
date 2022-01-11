@@ -14,12 +14,12 @@ use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
 /**
- * @property null|int $user_id -- the user identification key. Defaults to null, meaning use current active user id.
- * @property Connection|array|string $db -- the DB connection object or the application component ID of the DB connection.
- * @property null|array $serializer -- the functions used to serialize and unserialize values. Defaults to null, meaning
+ * @property null|int $user_id The user identification key. Defaults to null, meaning use current active user id.
+ * @property Connection|array|string $db The DB connection object or the application component ID of the DB connection.
+ * @property null|array $serializer The functions used to serialize and unserialize values. Defaults to null, meaning
  * using the default PHP `serialize()` and `unserialize()` functions
- * @property bool $cacheEnabled -- enable intermediate caching via Yii::$app->cache (must be configured in framework)
- * @property-read string $tableName
+ * @property bool $cacheEnabled Enable intermediate caching via Yii::$app->cache (must be configured in framework)
+ * @property-read string $tableName Configured storage table name
  *
  * Функции доступны у модели пользователя как $user->options->get($key) и $user->options->set($key, $value);
  * $value может быть любым сериализуемым типом данных.
