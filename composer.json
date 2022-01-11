@@ -14,7 +14,7 @@
 		}
 	],
 	"require": {
-
+		"php": ">=8.0"
 	},
 	"require-dev": {
 		"yiisoft/yii2": "dev-master"
