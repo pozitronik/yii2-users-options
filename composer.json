@@ -23,5 +23,11 @@
 		"psr-4": {
 			"pozitronik\\users_options\\": "src"
 		}
-	}
+	},
+	"repositories": [
+		{
+			"type": "composer",
+			"url": "https://asset-packagist.org"
+		}
+	]
 }
