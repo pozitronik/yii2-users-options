@@ -10,7 +10,7 @@ use yii\db\ActiveRecord;
  * Trait UsersOptionsTrait
  * @package pozitronik\users_options\traits
  *
- * @property UsersOptions $options -- атрибут для обращения к правам пользователя (не реляционный, см. класс)
+ * @property UsersOptions $options Атрибут для обращения к правам пользователя (не реляционный, см. класс)
  */
 trait UsersOptionsTrait {
 	/**
@@ -18,6 +18,6 @@ trait UsersOptionsTrait {
 	 */
 	public function getOptions():UsersOptions {
 		/** @var ActiveRecord $this */
-		return new UsersOptions(['user_id' => $this->id]);
+		return new UsersOptions(['user_id' => $this->primaryKey]);
 	}
 }
