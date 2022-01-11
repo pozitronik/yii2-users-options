@@ -35,7 +35,7 @@ class UsersOptions extends Model {
 	/**
 	 * @var null|int the user identification key. Defaults to null, meaning use current active user id.
 	 */
-	public $user_id;
+	public ?int $user_id;
 
 	/**
 	 * @var Connection|array|string the DB connection object or the application component ID of the DB connection.
@@ -43,7 +43,7 @@ class UsersOptions extends Model {
 	 * with a DB connection object.
 	 * This can also be a configuration array for creating the object.
 	 */
-	public $db = 'db';
+	public Connection|array|string $db = 'db';
 
 	/**
 	 * @var null|array the functions used to serialize and unserialize values. Defaults to null, meaning
@@ -52,7 +52,7 @@ class UsersOptions extends Model {
 	 * a two-element array. The first element specifies the serialization function, and the second the deserialization
 	 * function.
 	 */
-	public $serializer;
+	public ?array $serializer;
 	/**
 	 * @var bool enable intermediate caching via Yii::$app->cache (must be configured in framework). Default option
 	 * value can be set in module configuration, e.g.
@@ -65,11 +65,8 @@ class UsersOptions extends Model {
 	 *        ],
 	 * ...
 	 */
-	public $cacheEnabled = false;
-	/**
-	 * @var string
-	 */
-	private $_tableName = 'users_options';
+	public bool $cacheEnabled = false;
+	private string $_tableName = 'users_options';
 
 	/**
 	 * {@inheritdoc}
