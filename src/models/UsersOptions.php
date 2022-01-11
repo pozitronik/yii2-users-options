@@ -86,7 +86,7 @@ class UsersOptions extends Model {
 	 * @param mixed $value
 	 * @return string
 	 */
-	protected function serialize($value):string {
+	protected function serialize(mixed $value):string {
 		return (null === $this->serializer)
 			?serialize($value)
 			:call_user_func($this->serializer[0], $value);
@@ -155,7 +155,7 @@ class UsersOptions extends Model {
 	 * @param mixed $value
 	 * @return bool
 	 */
-	public function set(string $option, $value):bool {
+	public function set(string $option, mixed $value):bool {
 		TagDependency::invalidate(Yii::$app->cache, [static::class."::get({$this->user_id},{$option})"]);
 		return $this->applyDbValue($option, $this->serialize($value));
 	}
@@ -178,7 +178,7 @@ class UsersOptions extends Model {
 	 * @param mixed $value
 	 * @return bool
 	 */
-	public static function setStatic(int $user_id, string $option, $value):bool {
+	public static function setStatic(int $user_id, string $option, mixed $value):bool {
 		return (new self(['user_id' => $user_id]))->set($option, $value);
 	}
 
