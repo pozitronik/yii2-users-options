@@ -2,6 +2,9 @@ yii2-users-options
 =================
 Хранение настроек пользователя на сервере (a-la server-side cookies)
 
+[![Build Status](https://github.com/pozitronik/yii2-users-options/actions/workflows/ci.yml/badge.svg)](https://github.com/pozitronik/yii2-users-options/actions)
+
+
 Установка
 ---------
 
