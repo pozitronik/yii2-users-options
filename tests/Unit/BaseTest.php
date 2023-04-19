@@ -161,4 +161,30 @@ class BaseTest extends Unit {
 		static::assertNull(UsersOptions::getStatic($user->id, 'string'));
 	}
 
+	/**
+	 * @return void
+	 * @throws BaseException
+	 * @throws Throwable
+	 */
+	public function testDropAll():void {
+		$user = Users::CreateUser();
+		$randomString = Yii::$app->security->generateRandomString();
+		$randomInt = random_int(PHP_INT_MIN, PHP_INT_MAX);
+		static::assertTrue($user->options->set('string', $randomString));
+		static::assertTrue($user->options->set('int', $randomInt));
+		static::assertEquals($randomString, $user->options->get('string'));
+		static::assertEquals($randomInt, $user->options->get('int'));
+		static::assertTrue($user->options->dropAll());
+		static::assertNull($user->options->get('string'));
+		static::assertNull($user->options->get('int'));
+
+		static::assertTrue(UsersOptions::setStatic($user->id, 'string', $randomString));
+		static::assertTrue(UsersOptions::setStatic($user->id, 'int', $randomInt));
+		static::assertEquals($randomString, UsersOptions::getStatic($user->id, 'string'));
+		static::assertEquals($randomInt, UsersOptions::getStatic($user->id, 'int'));
+		static::assertTrue(UsersOptions::dropAllStatic($user->id));
+		static::assertNull(UsersOptions::getStatic($user->id, 'string'));
+		static::assertNull(UsersOptions::getStatic($user->id, 'int'));
+	}
+
 }
