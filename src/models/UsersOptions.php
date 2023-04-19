@@ -102,7 +102,7 @@ class UsersOptions extends Model {
 	/**
 	 * @return array
 	 */
-	private function retrieveAllValues():array {
+	protected function retrieveAllValues():array {
 		$values = ArrayHelper::map((new Query())->select(['option', 'value'])->from($this->_tableName)->where(['user_id' => $this->user_id])->all(), 'option', 'value');
 		return array_map(static function($value):string {
 			if (is_resource($value) && 'stream' === get_resource_type($value)) {
@@ -152,6 +152,25 @@ class UsersOptions extends Model {
 
 	/**
 	 * @param string $option
+	 * @return bool
+	 */
+	private function removeDbValue(string $option):bool {
+		try {
+			return $this->db->noCache(function(Connection $db) use ($option) {
+				$db->createCommand()->delete($this->_tableName, [
+					'user_id' => $this->user_id,
+					'option' => $option,
+				])->execute();
+				return true;
+			});
+		} catch (Throwable $e) {
+			Yii::warning("Unable to delete table value: {$e->getMessage()}", __METHOD__);
+		}
+		return false;
+	}
+
+	/**
+	 * @param string $option
 	 * @return mixed
 	 * @throws Throwable
 	 */
@@ -170,6 +189,15 @@ class UsersOptions extends Model {
 	public function set(string $option, mixed $value):bool {
 		TagDependency::invalidate(Yii::$app->cache, [static::class."::get({$this->user_id},{$option})", static::class."::list()"]);
 		return $this->applyDbValue($option, $this->serialize($value));
+	}
+
+	/**
+	 * @param string $option
+	 * @return bool
+	 */
+	public function drop(string $option):bool {
+		TagDependency::invalidate(Yii::$app->cache, [static::class."::get({$this->user_id},{$option})", static::class."::list()"]);
+		return $this->removeDbValue($option);
 	}
 
 	/**
@@ -207,12 +235,22 @@ class UsersOptions extends Model {
 	}
 
 	/**
+	 * Статический вызов с той же логикой, что у drop()
+	 * @param int $user_id
+	 * @param string $option
+	 * @return bool
+	 */
+	public static function dropStatic(int $user_id, string $option):bool {
+		return (new self(['user_id' => $user_id]))->drop($option);
+	}
+
+	/**
 	 * Статический вызов с той же логикой, что у list()
 	 * @param int $user_id
 	 * @return array
 	 * @throws Throwable
 	 */
-	public static function listStatic(int $user_id,):array {
+	public static function listStatic(int $user_id):array {
 		return (new self(['user_id' => $user_id]))->list();
 	}
 

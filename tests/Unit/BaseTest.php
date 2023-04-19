@@ -143,4 +143,23 @@ class BaseTest extends Unit {
 		], UsersOptions::listStatic($user->id));
 	}
 
+	/**
+	 * @return void
+	 * @throws BaseException
+	 * @throws Throwable
+	 */
+	public function testDrop():void {
+		$user = Users::CreateUser();
+		$randomString = Yii::$app->security->generateRandomString();
+		static::assertTrue($user->options->set('string', $randomString));
+		static::assertEquals($randomString, $user->options->get('string'));
+		static::assertTrue($user->options->drop('string'));
+		static::assertNull($user->options->get('string'));
+
+		static::assertTrue(UsersOptions::setStatic($user->id, 'string', $randomString));
+		static::assertEquals($randomString, UsersOptions::getStatic($user->id, 'string'));
+		static::assertTrue(UsersOptions::dropStatic($user->id, 'string'));
+		static::assertNull(UsersOptions::getStatic($user->id, 'string'));
+	}
+
 }
