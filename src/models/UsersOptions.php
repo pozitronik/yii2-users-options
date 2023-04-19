@@ -170,13 +170,35 @@ class UsersOptions extends Model {
 	}
 
 	/**
+	 * @return bool
+	 */
+	private function removeAllDBValues():bool {
+		try {
+			return $this->db->noCache(function(Connection $db) {
+				$db->createCommand()->delete($this->_tableName, [
+					'user_id' => $this->user_id,
+				])->execute();
+				return true;
+			});
+		} catch (Throwable $e) {
+			Yii::warning("Unable to delete table value: {$e->getMessage()}", __METHOD__);
+		}
+		return false;
+	}
+
+	/**
 	 * @param string $option
 	 * @return mixed
 	 * @throws Throwable
 	 */
 	public function get(string $option) {
 		$dbValue = ($this->cacheEnabled)
-			?Yii::$app->cache->getOrSet(static::class."::get({$option})", fn() => $this->retrieveDbValue($option), null, new TagDependency(['tags' => static::class."::get({$option})"]))
+			?Yii::$app->cache->getOrSet(
+				static::class."::get({$option})",
+				fn() => $this->retrieveDbValue($option),
+				null,
+				new TagDependency(['tags' => static::class."::get({$option})", static::class."::dropAll()"])
+			)
 			:$this->retrieveDbValue($option);
 		return $this->unserialize($dbValue);
 	}
@@ -208,6 +230,14 @@ class UsersOptions extends Model {
 			?Yii::$app->cache->getOrSet(static::class."::list()", fn() => $this->retrieveAllValues(), null, new TagDependency(['tags' => static::class."::list()"]))
 			:$this->retrieveAllValues();
 		return array_map(fn(string $value):mixed => $this->unserialize($value), $dbValues);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function dropAll():bool {
+		TagDependency::invalidate(Yii::$app->cache, [static::class."::dropAll()", static::class."::list()"]);
+		return $this->removeAllDBValues();
 	}
 
 	/**
@@ -249,6 +279,15 @@ class UsersOptions extends Model {
 	 */
 	public static function listStatic(int $user_id):array {
 		return (new self(['user_id' => $user_id]))->list();
+	}
+
+	/**
+	 * Статический вызов с той же логикой, что у dropAll()
+	 * @param int $user_id
+	 * @return bool
+	 */
+	public static function dropAllStatic(int $user_id):bool {
+		return (new self(['user_id' => $user_id]))->dropAll();
 	}
 
 	/**

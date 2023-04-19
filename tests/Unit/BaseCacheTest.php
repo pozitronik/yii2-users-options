@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Tests\Unit;
+namespace Unit;
 
 use app\models\Users;
 use Codeception\Test\Unit;
@@ -10,15 +10,16 @@ use Tests\Support\Helper\MigrationHelper;
 use Tests\Support\UnitTester;
 use Throwable;
 use Yii;
-use yii\base\Application;
 use yii\base\Exception as BaseException;
+use yii\base\InvalidConfigException;
 use yii\base\InvalidRouteException;
+use yii\caching\FileCache;
 use yii\console\Exception;
 
 /**
- *
+ * Component tests with enabled cache
  */
-class BaseTest extends Unit {
+class BaseCacheTest extends Unit {
 
 	protected UnitTester $tester;
 
@@ -26,16 +27,21 @@ class BaseTest extends Unit {
 	 * @return void
 	 * @throws Exception
 	 * @throws InvalidRouteException
+	 * @throws InvalidConfigException
 	 */
 	protected function _before():void {
 		MigrationHelper::migrateFresh(['migrationPath' => ['@app/migrations/', '@app/../../migrations']]);
+		Yii::$app->set('cache', [
+			'class' => FileCache::class
+		]);
+//		Yii::$app->cache->flush();
 	}
 
 	/**
 	 * @return void
 	 */
-	public function testYiiPresent():void {
-		$this->tester->assertInstanceOf(Application::class, Yii::$app);
+	public function testCachePresent():void {
+		$this->tester->assertInstanceOf(FileCache::class, Yii::$app->cache);
 	}
 
 	/**

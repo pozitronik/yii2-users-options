@@ -90,6 +90,7 @@ $options->serializer = [
 * `get(string $option):mixed` - возвращает значение параметра `$option` для установленного пользователя.
 * `set(string $option, mixed $value):bool` - присваивает параметру `$option` значение `$value`. Возвращает успех сохранения параметра.
 * `drop(string $option):bool` - удаляет параметр `$option` (без проверки его существования). Возвращает успех удаления параметра.
+* `dropAll():bool` - удаляет все параметры пользователя.
 * `list():array` - возвращает массив всех сохранённых параметров пользователя в формате [`$option` => `$value`].
 
 а также статические методы
@@ -97,9 +98,10 @@ $options->serializer = [
 * `getStatic(int $user_id, string $option):mixed`
 * `setStatic(int $user_id, string $option, mixed $value):bool`
 * `dropStatic(int $user_id, string $option):bool`
+* `dropAllStatic(int $user_id):bool`
 * `listStatic(int $user_id):array`
 
-Аналогичные вызовам `get()`/`set()`/`drop()`/`list()`.
+Аналогичные вызовам `get()`/`set()`/`drop()`/`dropAll()`/`list()`.
 
 В случае, если модель пользователя расширяет класс `ActiveRecord` и имеет целочисленный идентификатор `$id`, то проще всего использовать
 трейт `pozitronik\users_options\traits\UsersOptionsTrait.php`. В нём описано свойство `$options`, возвращающее объект `UsersOptions`. Просто
