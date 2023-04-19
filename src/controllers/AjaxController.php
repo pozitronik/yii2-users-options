@@ -95,7 +95,7 @@ class AjaxController extends Controller {
 	/**
 	 * @return array
 	 */
-	public function actionUserListOption():array {
+	public function actionUserListOptions():array {
 		if (null === $user = Yii::$app->user->identity) return (['user' => 'Unauthorized']);
 		return [
 			'value' => UsersOptions::listStatic((int)$user->getId())
