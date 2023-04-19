@@ -100,6 +100,21 @@ class UsersOptions extends Model {
 	}
 
 	/**
+	 * @return array
+	 */
+	private function retrieveAllValues():array {
+		$values = ArrayHelper::map((new Query())->select(['option', 'value'])->from($this->_tableName)->where(['user_id' => $this->user_id])->all(), 'option', 'value');
+		return array_map(static function($value):string {
+			if (is_resource($value) && 'stream' === get_resource_type($value)) {
+				$result = stream_get_contents($value);
+				fseek($value, 0);
+				return $result;
+			}
+			return $value;
+		}, $values);
+	}
+
+	/**
 	 * @param string $option
 	 * @return string
 	 * @throws Exception
@@ -153,8 +168,20 @@ class UsersOptions extends Model {
 	 * @return bool
 	 */
 	public function set(string $option, mixed $value):bool {
-		TagDependency::invalidate(Yii::$app->cache, [static::class."::get({$this->user_id},{$option})"]);
+		TagDependency::invalidate(Yii::$app->cache, [static::class."::get({$this->user_id},{$option})", static::class."::list()"]);
 		return $this->applyDbValue($option, $this->serialize($value));
+	}
+
+	/**
+	 * @return array
+	 * @throws Throwable
+	 */
+	public function list():array {
+		$dbValues = ($this->cacheEnabled)
+			?Yii::$app->cache->getOrSet(static::class."::list()", fn() => $this->retrieveAllValues(), null, new TagDependency(['tags' => static::class."::list()"]))
+			:$this->retrieveAllValues();
+
+		return array_map(fn(string $value):mixed => $this->unserialize($value), $dbValues);
 	}
 
 	/**
