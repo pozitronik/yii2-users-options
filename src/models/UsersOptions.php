@@ -202,13 +202,11 @@ class UsersOptions extends Model {
 
 	/**
 	 * @return array
-	 * @throws Throwable
 	 */
 	public function list():array {
 		$dbValues = ($this->cacheEnabled)
 			?Yii::$app->cache->getOrSet(static::class."::list()", fn() => $this->retrieveAllValues(), null, new TagDependency(['tags' => static::class."::list()"]))
 			:$this->retrieveAllValues();
-
 		return array_map(fn(string $value):mixed => $this->unserialize($value), $dbValues);
 	}
 
@@ -248,7 +246,6 @@ class UsersOptions extends Model {
 	 * Статический вызов с той же логикой, что у list()
 	 * @param int $user_id
 	 * @return array
-	 * @throws Throwable
 	 */
 	public static function listStatic(int $user_id):array {
 		return (new self(['user_id' => $user_id]))->list();

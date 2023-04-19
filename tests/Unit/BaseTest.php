@@ -115,7 +115,6 @@ class BaseTest extends Unit {
 	/**
 	 * @return void
 	 * @throws BaseException
-	 * @throws Throwable
 	 */
 	public function testList():void {
 		$user = Users::CreateUser();
