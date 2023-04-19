@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace app\models;
 
+use pozitronik\users_options\traits\UsersOptionsTrait;
 use yii\db\ActiveRecord;
 use yii\db\Exception;
 use yii\web\IdentityInterface;
@@ -17,6 +18,7 @@ use yii\web\IdentityInterface;
  * @property-read string $authKey @see [[yii\web\IdentityInterface::getAuthKey()]]
  */
 class Users extends ActiveRecord implements IdentityInterface {
+	use UsersOptionsTrait;
 
 	/**
 	 * {@inheritdoc}
