@@ -1,8 +1,12 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Tests\Support;
+
+use Codeception\Actor;
+use Yii;
+use yii\base\Exception;
 
 /**
  * Inherited Methods
@@ -18,12 +22,21 @@ namespace Tests\Support;
  * @method void pause($vars = [])
  *
  * @SuppressWarnings(PHPMD)
-*/
-class UnitTester extends \Codeception\Actor
-{
-    use _generated\UnitTesterActions;
+ */
+class UnitTester extends Actor {
+	use _generated\UnitTesterActions;
 
-    /**
-     * Define custom actions here
-     */
+	/**
+	 * @return array
+	 * @throws Exception
+	 */
+	public static function GetRandomArray():array {
+		return array_map(static function() {
+			return match (random_int(1, 3)) {
+				1 => Yii::$app->security->generateRandomString(),
+				2 => random_int(PHP_INT_MIN, PHP_INT_MAX),
+				3 => random_int(PHP_INT_MIN, PHP_INT_MAX) / random_int(PHP_INT_MIN, PHP_INT_MAX),
+			};
+		}, range(1, random_int(1, 100)));
+	}
 }
