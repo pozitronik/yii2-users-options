@@ -100,6 +100,21 @@ class UsersOptions extends Model {
 	}
 
 	/**
+	 * @return array
+	 */
+	protected function retrieveAllValues():array {
+		$values = ArrayHelper::map((new Query())->select(['option', 'value'])->from($this->_tableName)->where(['user_id' => $this->user_id])->all(), 'option', 'value');
+		return array_map(static function($value):string {
+			if (is_resource($value) && 'stream' === get_resource_type($value)) {
+				$result = stream_get_contents($value);
+				fseek($value, 0);
+				return $result;
+			}
+			return $value;
+		}, $values);
+	}
+
+	/**
 	 * @param string $option
 	 * @return string
 	 * @throws Exception
@@ -137,6 +152,25 @@ class UsersOptions extends Model {
 
 	/**
 	 * @param string $option
+	 * @return bool
+	 */
+	private function removeDbValue(string $option):bool {
+		try {
+			return $this->db->noCache(function(Connection $db) use ($option) {
+				$db->createCommand()->delete($this->_tableName, [
+					'user_id' => $this->user_id,
+					'option' => $option,
+				])->execute();
+				return true;
+			});
+		} catch (Throwable $e) {
+			Yii::warning("Unable to delete table value: {$e->getMessage()}", __METHOD__);
+		}
+		return false;
+	}
+
+	/**
+	 * @param string $option
 	 * @return mixed
 	 * @throws Throwable
 	 */
@@ -153,8 +187,27 @@ class UsersOptions extends Model {
 	 * @return bool
 	 */
 	public function set(string $option, mixed $value):bool {
-		TagDependency::invalidate(Yii::$app->cache, [static::class."::get({$this->user_id},{$option})"]);
+		TagDependency::invalidate(Yii::$app->cache, [static::class."::get({$this->user_id},{$option})", static::class."::list()"]);
 		return $this->applyDbValue($option, $this->serialize($value));
+	}
+
+	/**
+	 * @param string $option
+	 * @return bool
+	 */
+	public function drop(string $option):bool {
+		TagDependency::invalidate(Yii::$app->cache, [static::class."::get({$this->user_id},{$option})", static::class."::list()"]);
+		return $this->removeDbValue($option);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function list():array {
+		$dbValues = ($this->cacheEnabled)
+			?Yii::$app->cache->getOrSet(static::class."::list()", fn() => $this->retrieveAllValues(), null, new TagDependency(['tags' => static::class."::list()"]))
+			:$this->retrieveAllValues();
+		return array_map(fn(string $value):mixed => $this->unserialize($value), $dbValues);
 	}
 
 	/**
@@ -164,7 +217,7 @@ class UsersOptions extends Model {
 	 * @return mixed
 	 * @throws Throwable
 	 */
-	public static function getStatic(int $user_id, string $option) {
+	public static function getStatic(int $user_id, string $option):mixed {
 		return (new self(['user_id' => $user_id]))->get($option);
 	}
 
@@ -177,6 +230,25 @@ class UsersOptions extends Model {
 	 */
 	public static function setStatic(int $user_id, string $option, mixed $value):bool {
 		return (new self(['user_id' => $user_id]))->set($option, $value);
+	}
+
+	/**
+	 * Статический вызов с той же логикой, что у drop()
+	 * @param int $user_id
+	 * @param string $option
+	 * @return bool
+	 */
+	public static function dropStatic(int $user_id, string $option):bool {
+		return (new self(['user_id' => $user_id]))->drop($option);
+	}
+
+	/**
+	 * Статический вызов с той же логикой, что у list()
+	 * @param int $user_id
+	 * @return array
+	 */
+	public static function listStatic(int $user_id):array {
+		return (new self(['user_id' => $user_id]))->list();
 	}
 
 	/**

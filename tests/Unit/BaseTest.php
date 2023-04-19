@@ -112,4 +112,53 @@ class BaseTest extends Unit {
 		static::assertNull($user->options->get('bool'));
 	}
 
+	/**
+	 * @return void
+	 * @throws BaseException
+	 */
+	public function testList():void {
+		$user = Users::CreateUser();
+		$randomString = Yii::$app->security->generateRandomString();
+		$randomInt = random_int(PHP_INT_MIN, PHP_INT_MAX);
+		$randomFloat = random_int(PHP_INT_MIN, PHP_INT_MAX) / random_int(PHP_INT_MIN, PHP_INT_MAX);
+		$randomArray = $this->tester::GetRandomArray();
+		static::assertTrue($user->options->set('string', $randomString));
+		static::assertTrue($user->options->set('int', $randomInt));
+		static::assertTrue($user->options->set('float', $randomFloat));
+		static::assertTrue($user->options->set('array', $randomArray));
+
+		static::assertEquals([
+			'string' => $randomString,
+			'int' => $randomInt,
+			'float' => $randomFloat,
+			'array' => $randomArray,
+		], $user->options->list());
+
+		static::assertEquals([
+			'string' => $randomString,
+			'int' => $randomInt,
+			'float' => $randomFloat,
+			'array' => $randomArray,
+		], UsersOptions::listStatic($user->id));
+	}
+
+	/**
+	 * @return void
+	 * @throws BaseException
+	 * @throws Throwable
+	 */
+	public function testDrop():void {
+		$user = Users::CreateUser();
+		$randomString = Yii::$app->security->generateRandomString();
+		static::assertTrue($user->options->set('string', $randomString));
+		static::assertEquals($randomString, $user->options->get('string'));
+		static::assertTrue($user->options->drop('string'));
+		static::assertNull($user->options->get('string'));
+
+		static::assertTrue(UsersOptions::setStatic($user->id, 'string', $randomString));
+		static::assertEquals($randomString, UsersOptions::getStatic($user->id, 'string'));
+		static::assertTrue(UsersOptions::dropStatic($user->id, 'string'));
+		static::assertNull(UsersOptions::getStatic($user->id, 'string'));
+	}
+
 }
