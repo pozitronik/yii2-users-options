@@ -191,7 +191,7 @@ class UsersOptions extends Model {
 	 * @return mixed
 	 * @throws Throwable
 	 */
-	public static function getStatic(int $user_id, string $option) {
+	public static function getStatic(int $user_id, string $option):mixed {
 		return (new self(['user_id' => $user_id]))->get($option);
 	}
 
@@ -204,6 +204,16 @@ class UsersOptions extends Model {
 	 */
 	public static function setStatic(int $user_id, string $option, mixed $value):bool {
 		return (new self(['user_id' => $user_id]))->set($option, $value);
+	}
+
+	/**
+	 * Статический вызов с той же логикой, что у list()
+	 * @param int $user_id
+	 * @return array
+	 * @throws Throwable
+	 */
+	public static function listStatic(int $user_id,):array {
+		return (new self(['user_id' => $user_id]))->list();
 	}
 
 	/**

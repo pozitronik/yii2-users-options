@@ -134,6 +134,13 @@ class BaseTest extends Unit {
 			'float' => $randomFloat,
 			'array' => $randomArray,
 		], $user->options->list());
+
+		static::assertEquals([
+			'string' => $randomString,
+			'int' => $randomInt,
+			'float' => $randomFloat,
+			'array' => $randomArray,
+		], UsersOptions::listStatic($user->id));
 	}
 
 }
