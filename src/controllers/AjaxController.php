@@ -85,14 +85,20 @@ class AjaxController extends Controller {
 	/**
 	 * @return array
 	 */
+	public function actionUserDropAllOptions():array {
+		if (null === $user = Yii::$app->user->identity) return (['user' => 'Unauthorized']);
+		return [
+			'value' => UsersOptions::dropAllStatic($user->getId())
+		];
+	}
+
+	/**
+	 * @return array
+	 */
 	public function actionUserListOption():array {
-		if (false !== $key = Yii::$app->request->post('key', false)) {
-			if (null === $user = Yii::$app->user->identity) return (['user' => 'Unauthorized']);
-			return [
-				'key' => $key,
-				'value' => UsersOptions::listStatic((int)$user->getId())
-			];
-		}
-		return (['key' => 'Not specified']);
+		if (null === $user = Yii::$app->user->identity) return (['user' => 'Unauthorized']);
+		return [
+			'value' => UsersOptions::listStatic((int)$user->getId())
+		];
 	}
 }
