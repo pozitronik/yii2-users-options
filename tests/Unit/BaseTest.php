@@ -39,6 +39,7 @@ class BaseTest extends Unit {
 	}
 
 	/**
+	 * Test basic set/get functionality with various data types
 	 * @return void
 	 * @throws Throwable
 	 * @throws BaseException
@@ -50,6 +51,7 @@ class BaseTest extends Unit {
 		$randomInt = random_int(PHP_INT_MIN, PHP_INT_MAX);
 		$randomFloat = random_int(PHP_INT_MIN, PHP_INT_MAX) / random_int(PHP_INT_MIN, PHP_INT_MAX);
 		$randomArray = $this->tester::GetRandomArray();
+		
 		static::assertTrue($userOptions->set('string', $randomString));
 		static::assertTrue($userOptions->set('int', $randomInt));
 		static::assertTrue($userOptions->set('float', $randomFloat));

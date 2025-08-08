@@ -7,6 +7,17 @@ paths:
     support: tests/Support
     envs: tests/_envs
 bootstrap: _bootstrap.php
+coverage:
+    enabled: true
+    include:
+        - src/*
+    exclude:
+        - tests/*
+        - vendor/*
+    remote: false
+    xml: tests/_output/coverage.xml
+    html: tests/_output/coverage
+    text: tests/_output/coverage.txt
 modules:
   config:
     Db:

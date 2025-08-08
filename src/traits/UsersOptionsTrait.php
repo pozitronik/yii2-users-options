@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace pozitronik\users_options\traits;
 
 use pozitronik\users_options\models\UsersOptions;
-use yii\db\ActiveRecord;
 
 /**
  * Trait UsersOptionsTrait
@@ -16,7 +15,6 @@ trait UsersOptionsTrait {
 	 * @return UsersOptions
 	 */
 	public function getOptions():UsersOptions {
-		/** @var ActiveRecord $this */
 		return new UsersOptions(['user_id' => $this->primaryKey]);
 	}
 }

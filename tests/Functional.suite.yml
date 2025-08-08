@@ -8,5 +8,8 @@
 actor: FunctionalTester
 modules:
     enabled:
-        # add a framework module here
+        - Asserts
+        - Db
+        - Yii2:
+            configFile: './tests/_app/config/main.php'
 step_decorators: ~
