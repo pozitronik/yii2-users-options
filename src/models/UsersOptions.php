@@ -103,7 +103,7 @@ class UsersOptions extends Model {
 	 * @return array
 	 */
 	protected function retrieveAllValues():array {
-		$values = ArrayHelper::map(new Query()->select(['option', 'value'])->from($this->_tableName)->where(['user_id' => $this->user_id])->all(), 'option', 'value');
+		$values = ArrayHelper::map((new Query())->select(['option', 'value'])->from($this->_tableName)->where(['user_id' => $this->user_id])->all(), 'option', 'value');
 		return array_map(static function($value):string {
 			if (is_resource($value) && 'stream' === get_resource_type($value)) {
 				$result = stream_get_contents($value);
@@ -120,7 +120,7 @@ class UsersOptions extends Model {
 	 * @throws Exception
 	 */
 	protected function retrieveDbValue(string $option):string {
-		$value = ArrayHelper::getValue(new Query()->select('value')->from($this->_tableName)->where(['option' => $option, 'user_id' => $this->user_id])->one(), 'value', serialize(null));
+		$value = ArrayHelper::getValue((new Query())->select('value')->from($this->_tableName)->where(['option' => $option, 'user_id' => $this->user_id])->one(), 'value', serialize(null));
 		if (is_resource($value) && 'stream' === get_resource_type($value)) {
 			$result = stream_get_contents($value);
 			fseek($value, 0);
@@ -248,7 +248,7 @@ class UsersOptions extends Model {
 	 * @throws Throwable
 	 */
 	public static function getStatic(int $user_id, string $option):mixed {
-		return new self(['user_id' => $user_id])->get($option);
+		return (new self(['user_id' => $user_id]))->get($option);
 	}
 
 	/**
@@ -259,7 +259,7 @@ class UsersOptions extends Model {
 	 * @return bool
 	 */
 	public static function setStatic(int $user_id, string $option, mixed $value):bool {
-		return new self(['user_id' => $user_id])->set($option, $value);
+		return (new self(['user_id' => $user_id]))->set($option, $value);
 	}
 
 	/**
@@ -269,7 +269,7 @@ class UsersOptions extends Model {
 	 * @return bool
 	 */
 	public static function dropStatic(int $user_id, string $option):bool {
-		return new self(['user_id' => $user_id])->drop($option);
+		return (new self(['user_id' => $user_id]))->drop($option);
 	}
 
 	/**
@@ -278,7 +278,7 @@ class UsersOptions extends Model {
 	 * @return array
 	 */
 	public static function listStatic(int $user_id):array {
-		return new self(['user_id' => $user_id])->list();
+		return (new self(['user_id' => $user_id]))->list();
 	}
 
 	/**
@@ -287,7 +287,7 @@ class UsersOptions extends Model {
 	 * @return bool
 	 */
 	public static function dropAllStatic(int $user_id):bool {
-		return new self(['user_id' => $user_id])->dropAll();
+		return (new self(['user_id' => $user_id]))->dropAll();
 	}
 
 	/**
